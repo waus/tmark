@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="tmark is a small, strict format for portable structured documents.">
+  <meta name="theme-color" content="#f3f3ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#101010" media="(prefers-color-scheme: dark)">
+  <title>tmark — content that travels</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23171717'/%3E%3Cpath d='M25 15H19v12l-6 5 6 5v12h6M39 15h6v12l6 5-6 5v12h-6' fill='none' stroke='%23f3f3ef' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --ink: #171717;
+      --paper: #f3f3ef;
+      --paper-2: #e5e5df;
+      --muted: #686864;
+      --line: rgba(23, 23, 23, .2);
+      --surface: #fafaf7;
+      --ecosystem: #191919;
+      --inverse-bg: #191919;
+      --inverse-fg: #f3f3ef;
+      --inverse-muted: #aaa9a3;
+      --display: "Helvetica Neue", Arial, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      --radius: .3rem;
+      --max: 1180px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink: #eeeeea;
+        --paper: #101010;
+        --paper-2: #1d1d1c;
+        --muted: #aaa9a3;
+        --line: rgba(238, 238, 234, .2);
+        --surface: #171717;
+        --ecosystem: #090909;
+        --inverse-bg: #090909;
+        --inverse-fg: #eeeeea;
+        --inverse-muted: #aaa9a3;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 400 1rem/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    ::selection { background: var(--ink); color: var(--paper); }
+    .wrap { width: min(calc(100% - 2.5rem), var(--max)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--paper) 86%, transparent);
+      backdrop-filter: blur(16px);
+    }
+    .nav {
+      min-height: 4.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      text-decoration: none;
+      font: 800 1.05rem/1 var(--mono);
+      letter-spacing: -.04em;
+    }
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: .3rem;
+      background: var(--inverse-bg);
+      color: var(--inverse-fg);
+      font: 700 1rem/1 var(--mono);
+    }
+    .nav-links { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-links a {
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 650;
+    }
+    .nav-links a:hover { text-decoration: underline; text-underline-offset: .25rem; }
+    .nav-github {
+      padding: .65rem .9rem;
+      border: 1px solid var(--ink);
+      border-radius: .25rem;
+    }
+    .nav-github:hover { background: var(--ink); color: var(--paper); text-decoration: none !important; }
+
+    .hero {
+      position: relative;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(26rem, 1.08fr);
+      gap: clamp(3rem, 6vw, 6rem);
+      align-items: center;
+      padding-block: clamp(5rem, 9vw, 8rem);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      margin: 0 0 1.25rem;
+      font: 700 .78rem/1 var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+    .eyebrow::before { content: ""; width: 2.25rem; height: 1px; background: var(--ink); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-kerning: none; }
+    h1 {
+      max-width: 780px;
+      margin-bottom: 1.5rem;
+      font: 820 clamp(3.7rem, 7.6vw, 7rem)/.86 var(--display);
+      letter-spacing: .035em;
+      text-transform: uppercase;
+    }
+    h1 span { color: inherit; }
+    .lede {
+      max-width: 650px;
+      margin-bottom: 1.8rem;
+      font-size: clamp(1.08rem, 1.7vw, 1.3rem);
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+    .inspired {
+      margin: -.6rem 0 1.7rem;
+      color: var(--muted);
+      font: 700 .78rem/1.25 var(--mono);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .8rem; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .65rem;
+      min-height: 3.25rem;
+      padding: .8rem 1.1rem;
+      border: 1px solid var(--ink);
+      border-radius: .25rem;
+      background: var(--ink);
+      color: var(--paper);
+      text-decoration: none;
+      font-weight: 750;
+      transition: transform .18s ease, background .18s ease, color .18s ease;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button.primary { background: var(--ink); color: var(--paper); }
+    .button.ghost { background: transparent; color: var(--ink); }
+    .button svg { width: 1.1rem; height: 1.1rem; }
+
+    .hero-visual {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      min-height: 27rem;
+      border: 1px solid var(--ink);
+      background: var(--surface);
+    }
+    .code-card, .render-card {
+      position: static;
+      border: 0;
+      box-shadow: none;
+    }
+    .code-card {
+      border-right: 1px solid color-mix(in srgb, var(--inverse-fg) 22%, transparent);
+      border-radius: 0;
+      overflow: hidden;
+      background: var(--inverse-bg);
+      color: var(--inverse-fg);
+    }
+    .window-bar {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .85rem 1rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--inverse-fg) 16%, transparent);
+      font: 650 .7rem/1 var(--mono);
+      color: var(--inverse-muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .dot { width: .48rem; height: .48rem; border-radius: 50%; background: color-mix(in srgb, var(--inverse-fg) 30%, transparent); }
+    .window-title { margin-left: auto; }
+    .code-card pre {
+      margin: 0;
+      padding: 1.5rem;
+      overflow: hidden;
+      font: 500 clamp(.73rem, 1.25vw, .86rem)/1.78 var(--mono);
+      white-space: pre-wrap;
+    }
+    .code-tag { color: var(--inverse-fg); }
+    .code-field { color: var(--inverse-muted); }
+    .code-text { color: var(--inverse-fg); }
+    .render-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      border-radius: 0;
+      background: var(--surface);
+    }
+    .render-label { margin-bottom: 1.25rem; font: 700 .7rem/1 var(--mono); text-transform: uppercase; color: var(--muted); letter-spacing: .1em; }
+    .render-card h3 { margin-bottom: .6rem; font-size: 1.4rem; letter-spacing: .01em; }
+    .render-card p { margin-bottom: 1.1rem; color: var(--muted); font-size: .92rem; }
+    .render-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .render-tags span { padding: .34rem .55rem; border: 1px solid var(--line); border-radius: .2rem; font: 650 .68rem/1 var(--mono); }
+    .format-pill {
+      position: absolute;
+      top: -.9rem;
+      right: 1rem;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      width: auto;
+      min-width: 7rem;
+      padding: .45rem .7rem;
+      border: 1px solid var(--ink);
+      border-radius: .2rem;
+      background: var(--paper);
+      font: 750 .65rem/1.2 var(--mono);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .principle-strip { border-bottom: 1px solid var(--line); background: var(--paper-2); color: var(--ink); }
+    .principle-strip-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .principle-strip span {
+      padding: 1rem 1.15rem;
+      border-right: 1px solid var(--line);
+      font: 700 .76rem/1.2 var(--mono);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .principle-strip span:last-child { border-right: 0; }
+
+    section { padding-block: clamp(4.5rem, 8vw, 7rem); }
+    .section-kicker { margin-bottom: 1rem; font: 700 .75rem/1 var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .section-title {
+      max-width: 900px;
+      margin-bottom: clamp(2.25rem, 4vw, 3.5rem);
+      font: 780 clamp(2.5rem, 5vw, 4.7rem)/.98 var(--display);
+      letter-spacing: .035em;
+      text-transform: uppercase;
+    }
+
+    .problem { border-bottom: 1px solid var(--line); }
+    .problem-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 5rem; }
+    .problem-intro { max-width: 28rem; font-size: 1.12rem; }
+    .principles { border-top: 1px solid var(--ink); }
+    .principle {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr;
+      gap: 1rem;
+      padding: 1.45rem 0;
+      border-bottom: 1px solid var(--ink);
+    }
+    .principle-num { font: 700 .78rem/1.5 var(--mono); color: var(--muted); }
+    .principle h3 { margin-bottom: .35rem; font-size: 1.2rem; letter-spacing: .01em; }
+    .principle p { margin-bottom: 0; color: var(--muted); }
+
+    .demo { border-bottom: 1px solid var(--line); }
+    .demo-shell { overflow: hidden; border: 1px solid var(--ink); border-radius: var(--radius); }
+    .demo-tabs { display: none; border-bottom: 1px solid var(--ink); background: var(--paper-2); }
+    .demo-tab {
+      flex: 1;
+      padding: 1rem;
+      border: 0;
+      border-right: 1px solid var(--ink);
+      background: transparent;
+      color: var(--ink);
+      font: 750 .76rem/1 var(--mono);
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .demo-tab:last-child { border-right: 0; }
+    .demo-tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .source-panel, .preview-panel { min-width: 0; }
+    .source-panel { background: var(--inverse-bg); color: var(--inverse-fg); }
+    .panel-head {
+      min-height: 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .8rem 1rem;
+      border-bottom: 1px solid currentColor;
+      font: 700 .72rem/1 var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .75;
+    }
+    .copy-button {
+      padding: .45rem .65rem;
+      border: 1px solid currentColor;
+      border-radius: .2rem;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+    .copy-button:hover { background: var(--inverse-fg); color: var(--inverse-bg); }
+    .source-panel pre {
+      margin: 0;
+      padding: clamp(1.4rem, 3vw, 2.5rem);
+      font: 500 clamp(.76rem, 1.3vw, .88rem)/1.75 var(--mono);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .preview-panel { background: var(--surface); color: var(--ink); }
+    .document { padding: clamp(2rem, 5vw, 4.5rem); }
+    .document-meta { margin-bottom: 2.2rem; color: var(--muted); font: 700 .72rem/1 var(--mono); text-transform: uppercase; letter-spacing: .12em; }
+    .document h3 { margin-bottom: 1rem; font: 800 clamp(2rem, 4vw, 3.8rem)/.94 var(--display); letter-spacing: .03em; text-transform: uppercase; }
+    .document > p { max-width: 34rem; color: var(--muted); font-size: 1.04rem; }
+    .doc-quote { margin: 2rem 0 0; padding: 1.1rem 1.25rem; border-left: 2px solid var(--ink); background: var(--paper); font-weight: 650; }
+    .doc-checks { display: grid; gap: .6rem; margin: 1.8rem 0 0; padding: 0; list-style: none; }
+    .doc-checks li { display: flex; gap: .7rem; align-items: center; }
+    .check { display: grid; place-items: center; width: 1.25rem; height: 1.25rem; border: 1px solid var(--ink); border-radius: .1rem; font: 900 .72rem/1 var(--mono); }
+
+    .surface-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+    .surface-item { min-height: 10rem; padding: 1.3rem; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .surface-item code { display: block; margin-bottom: 2rem; color: var(--muted); font: 700 .72rem/1 var(--mono); }
+    .surface-item h3 { margin-bottom: .3rem; font-size: 1.05rem; }
+    .surface-item p { margin: 0; color: var(--muted); font-size: .9rem; }
+
+    .ecosystem { background: var(--ecosystem); color: var(--inverse-fg); }
+    .ecosystem .section-kicker { color: var(--inverse-muted); }
+    .library-link:hover .repo-arrow { transform: translate(2px, -2px); background: var(--inverse-fg); color: var(--inverse-bg); }
+    .ecosystem-tier { margin-top: 4rem; }
+    .ecosystem .section-title + .ecosystem-tier { margin-top: 0; }
+    .tier-heading { margin-bottom: 1.25rem; font: 750 1.35rem/1.2 var(--display); letter-spacing: .01em; }
+    .repo-grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(255,255,255,.55); border-left: 1px solid rgba(255,255,255,.55); }
+    .repo-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.15rem;
+      aspect-ratio: 1;
+      padding: 1.5rem;
+      border-right: 1px solid rgba(255,255,255,.55);
+      border-bottom: 1px solid rgba(255,255,255,.55);
+      text-decoration: none;
+      text-align: center;
+      transition: background .18s ease;
+    }
+    .repo-card:hover { background: rgba(255,255,255,.06); }
+    .repo-icon { display: grid; place-items: center; width: 4rem; height: 4rem; }
+    .repo-icon svg { display: block; width: 3.25rem; height: 3.25rem; }
+    .repo-name { display: block; font-size: 1.2rem; font-weight: 750; letter-spacing: .01em; }
+    .repo-arrow { display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: .15rem; font: 700 1rem/1 var(--mono); transition: .18s ease; }
+    .library-list { display: grid; grid-template-columns: repeat(3, 1fr) 1.45fr; border-top: 1px solid rgba(255,255,255,.55); border-left: 1px solid rgba(255,255,255,.55); }
+    .library-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 5rem;
+      padding: 1rem 1.15rem;
+      border-right: 1px solid rgba(255,255,255,.55);
+      border-bottom: 1px solid rgba(255,255,255,.55);
+      text-decoration: none;
+      font-weight: 750;
+    }
+    .language-cta { background: var(--inverse-fg); color: var(--inverse-bg); }
+    .language-cta .repo-arrow { border: 1px solid var(--inverse-bg); }
+
+    footer { padding-block: 2rem; background: var(--inverse-bg); color: var(--inverse-fg); }
+    .footer-grid { display: flex; justify-content: space-between; gap: 2rem; align-items: center; }
+    footer p { margin: 0; color: var(--inverse-muted); font-size: .85rem; }
+    footer a { color: var(--inverse-fg); text-underline-offset: .25rem; }
+
+    :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+    @media (max-width: 920px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-visual { min-height: 24rem; }
+      .problem-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .surface-grid { grid-template-columns: repeat(2, 1fr); }
+      .repo-grid { grid-template-columns: repeat(2, 1fr); }
+      .library-list { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .wrap { width: min(calc(100% - 1.5rem), var(--max)); }
+      .nav-links a:not(.nav-github) { display: none; }
+      .hero-grid { padding-block: 4rem 3rem; gap: 2.5rem; }
+      h1 { font-size: clamp(3.4rem, 18vw, 5.5rem); }
+      .hero-visual { grid-template-columns: 1fr; min-height: auto; }
+      .code-card { border-right: 0; border-bottom: 1px solid color-mix(in srgb, var(--inverse-fg) 22%, transparent); }
+      .render-card { width: auto; padding: 1.5rem; }
+      .format-pill { width: auto; top: -.7rem; }
+      .principle-strip-grid { grid-template-columns: repeat(2, 1fr); }
+      .principle-strip span:nth-child(2) { border-right: 0; }
+      .principle-strip span:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .demo-tabs { display: flex; }
+      .demo-grid { display: block; }
+      .demo-panel[hidden] { display: none; }
+      .surface-grid { grid-template-columns: 1fr; }
+      .repo-grid { grid-template-columns: repeat(2, 1fr); }
+      .library-list { grid-template-columns: 1fr; }
+      .footer-grid { display: block; }
+      footer p + p { margin-top: .5rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .button, .repo-arrow { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav wrap" aria-label="Main navigation">
+      <a class="brand" href="#top"><span class="mark">{t}</span> tmark</a>
+      <div class="nav-links">
+        <a href="#why">Why tmark</a>
+        <a href="#format">Format</a>
+        <a href="#implementations">Implementations</a>
+        <a class="nav-github" href="https://github.com/waus/tmark" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-grid wrap">
+        <div>
+          <p class="eyebrow">Portable document markup</p>
+          <h1>Content that <span>travels.</span></h1>
+          <p class="lede">A small, strict format for document structure. Each app renders it in its own style.</p>
+          <p class="inspired">Inspired by Telegram rich messages</p>
+          <div class="hero-actions">
+            <a class="button primary" href="https://github.com/waus/tmark" target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+            <a class="button ghost" href="#demo">View example <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="A tmark source document becoming a rendered article">
+          <div class="format-pill">Same data<br>Any UI</div>
+          <div class="code-card">
+            <div class="window-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="window-title">article.tmark</span></div>
+            <pre><span class="code-tag">{document;</span>
+<span class="code-field">#title{</span><span class="code-text">Hello, world</span><span class="code-field">}</span>
+<span class="code-tag">{h;</span><span class="code-field">#s{1}</span><span class="code-text">Hello, world</span><span class="code-tag">}</span>
+<span class="code-tag">{p;</span><span class="code-text">This is </span><span class="code-tag">{b;</span><span class="code-text">structured</span><span class="code-tag">}</span>
+<span class="code-text">content — not a layout.</span><span class="code-tag">}</span>
+<span class="code-tag">}</span></pre>
+          </div>
+          <div class="render-card">
+            <div class="render-label">Your app · Your styles</div>
+            <h3>Hello, world</h3>
+            <p>This is <strong>structured</strong> content — not a layout.</p>
+            <div class="render-tags"><span>Web</span><span>iOS</span><span>Android</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="principle-strip" aria-label="tmark principles">
+      <div class="principle-strip-grid wrap">
+        <span>Structure over presentation</span><span>Strict by default</span><span>Portable by design</span><span>Native everywhere</span>
+      </div>
+    </div>
+
+    <section class="problem" id="why">
+      <div class="wrap">
+        <p class="section-kicker">01 / Why</p>
+        <h2 class="section-title">Structure travels. Presentation doesn’t.</h2>
+        <div class="problem-grid">
+          <p class="problem-intro">HTML and DOCX mix content with presentation. Markdown is fragmented, hard to extend and short on built-in types. tmark keeps the document structure; rendering stays with the app.</p>
+          <div class="principles">
+            <article class="principle">
+              <span class="principle-num">01</span>
+              <div><h3>Explicit structure</h3><p>Headings, lists, media, maps and other elements stay explicit.</p></div>
+            </article>
+            <article class="principle">
+              <span class="principle-num">02</span>
+              <div><h3>Renderer-owned presentation</h3><p>Web, mobile, bots and exports each use their own native styles.</p></div>
+            </article>
+            <article class="principle">
+              <span class="principle-num">03</span>
+              <div><h3>Small, strict surface</h3><p>Strict parsing and limited extensions keep documents portable.</p></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo" id="demo">
+      <div class="wrap">
+        <p class="section-kicker">02 / Example</p>
+        <h2 class="section-title">One source. Any renderer.</h2>
+        <div class="demo-shell">
+          <div class="demo-tabs" role="tablist" aria-label="Example view">
+            <button class="demo-tab" role="tab" aria-selected="true" aria-controls="source-panel" id="source-tab">Source</button>
+            <button class="demo-tab" role="tab" aria-selected="false" aria-controls="preview-panel" id="preview-tab">Rendered</button>
+          </div>
+          <div class="demo-grid">
+            <div class="source-panel demo-panel" id="source-panel" role="tabpanel" aria-labelledby="source-tab">
+              <div class="panel-head"><span>article.tmark</span><button class="copy-button" type="button" data-copy>Copy</button></div>
+              <pre id="tmark-example">{document;
+{h;#s{1}Portable documents}
+{p;Define the structure once. Let every app render it well.}
+{q;{p;Content structure should survive the interface.}}
+{list;
+{li;#type{checkbox}#checked{t}{p;Typed nodes}}
+{li;#type{checkbox}#checked{t}{p;Native rendering}}
+{li;#type{checkbox}#checked{t}{p;No layout hacks}}
+}
+}</pre>
+            </div>
+            <div class="preview-panel demo-panel" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+              <div class="panel-head"><span>Rendered by your product</span><span>Preview</span></div>
+              <article class="document">
+                <div class="document-meta">Guide · 2 min read</div>
+                <h3>Portable documents</h3>
+                <p>Define the structure once. Let every app render it well.</p>
+                <blockquote class="doc-quote">Content structure should survive the interface.</blockquote>
+                <ul class="doc-checks"><li><span class="check">✓</span> Typed nodes</li><li><span class="check">✓</span> Native rendering</li><li><span class="check">✓</span> No layout hacks</li></ul>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="format">
+      <div class="wrap">
+        <p class="section-kicker">03 / Format surface</p>
+        <h2 class="section-title">Document primitives, not a layout system.</h2>
+        <div class="surface-grid">
+          <article class="surface-item"><code>{h;} {p;}</code><h3>Text structure</h3><p>Headings, paragraphs, quotes, details and dividers.</p></article>
+          <article class="surface-item"><code>{list;} {table;}</code><h3>Collections</h3><p>Lists, tasks, tables, cells and nested content.</p></article>
+          <article class="surface-item"><code>{img;} {video;}</code><h3>Media</h3><p>Images, video, audio, slideshows and collages.</p></article>
+          <article class="surface-item"><code>{a;} {ref;}</code><h3>Connections</h3><p>Links, anchors, references, icons and dates.</p></article>
+          <article class="surface-item"><code>{b;} {i;} {m;}</code><h3>Inline meaning</h3><p>Emphasis, marks, spoilers, code and math.</p></article>
+          <article class="surface-item"><code>{map;}</code><h3>Rich blocks</h3><p>Maps, attached media and application-native embeds.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ecosystem" id="implementations">
+      <div class="wrap">
+        <p class="section-kicker">04 / Ecosystem</p>
+        <h2 class="section-title">Use tmark in your stack.</h2>
+        <div class="ecosystem-tier">
+          <h3 class="tier-heading">Ready to render in your app</h3>
+          <div class="repo-grid">
+            <a class="repo-card" href="https://github.com/waus/tmark-react" target="_blank" rel="noreferrer" aria-label="React renderer"><span class="repo-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#61dafb" stroke-width="1.4"><circle cx="12" cy="12" r="1.6" fill="#61dafb" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg></span><span class="repo-name">React</span></a>
+            <a class="repo-card" href="https://github.com/waus/tmark-flutter" target="_blank" rel="noreferrer" aria-label="Flutter renderer"><span class="repo-icon" aria-hidden="true"><svg viewBox="0 0 300 371.43"><defs><clipPath id="flutter-mark"><path d="M300 171.43 200 271.43l100 100H185.72l-42.86-42.86-57.15-57.15 100-100L300 171.43ZM185.72 0 0 185.72l57.15 57.15L300 0Z"/></clipPath></defs><g clip-path="url(#flutter-mark)"><polygon fill="#54c5f8" points="57.15 242.87 0 185.72 185.72 0 300 0 57.15 242.87"/><polygon fill="#54c5f8" points="300 171.43 185.72 171.43 85.73 271.44 142.85 328.57 300 171.43"/><polygon fill="#01579b" points="142.85 328.57 185.72 371.44 300 371.44 200.01 271.44 142.85 328.57"/><rect fill="#29b6f6" x="102.45" y="231.03" width="80.81" height="80.81" transform="translate(-150.09 180.52) rotate(-45)"/></g></svg></span><span class="repo-name">Flutter</span></a>
+            <a class="repo-card" href="https://github.com/waus/tmark-swift" target="_blank" rel="noreferrer" aria-label="Swift renderer"><span class="repo-icon" aria-hidden="true"><svg viewBox="0 0 59.391 59.391"><path fill="#F05138" d="M59.387 16.45a82.463 82.463 0 0 0-.027-1.792c-.035-1.301-.112-2.614-.343-3.9-.234-1.307-.618-2.523-1.222-3.71a12.464 12.464 0 0 0-5.453-5.452C51.156.992 49.941.609 48.635.374c-1.288-.232-2.6-.308-3.902-.343a85.714 85.714 0 0 0-1.792-.027C42.23 0 41.52 0 40.813 0H18.578c-.71 0-1.419 0-2.128.004-.597.004-1.195.01-1.792.027-.325.009-.651.02-.978.036-.978.047-1.959.133-2.924.307-.98.176-1.908.436-2.811.81A12.503 12.503 0 0 0 3.89 3.89a12.46 12.46 0 0 0-2.294 3.158C.992 8.235.61 9.45.374 10.758c-.231 1.286-.308 2.599-.343 3.9a85.767 85.767 0 0 0-.027 1.792C-.001 17.16 0 17.869 0 18.578v22.235c0 .71 0 1.418.004 2.128.004.597.01 1.194.027 1.791.035 1.302.112 2.615.343 3.901.235 1.307.618 2.523 1.222 3.71a12.457 12.457 0 0 0 5.453 5.453c1.186.603 2.401.986 3.707 1.22 1.287.232 2.6.31 3.902.344.597.016 1.195.023 1.793.027.709.005 1.417.004 2.127.004h22.235c.709 0 1.418 0 2.128-.004.597-.004 1.194-.011 1.792-.027 1.302-.035 2.614-.112 3.902-.343 1.306-.235 2.521-.618 3.707-1.222a12.461 12.461 0 0 0 5.453-5.452c.604-1.187.987-2.403 1.222-3.71.231-1.286.308-2.6.343-3.9.016-.598.023-1.194.027-1.792.004-.71.004-1.419.004-2.129V18.578c0-.71 0-1.419-.004-2.128z"/><path fill="#fff" d="m47.06 36.66-.004-.004c.066-.224.134-.446.191-.675 2.465-9.821-3.55-21.432-13.731-27.546 4.461 6.048 6.434 13.374 4.681 19.78-.156.571-.344 1.12-.552 1.653-.225-.148-.51-.316-.89-.527 0 0-10.127-6.252-21.103-17.312-.288-.29 5.852 8.777 12.822 16.14-3.284-1.843-12.434-8.5-18.227-13.802.712 1.187 1.558 2.33 2.489 3.43C17.573 23.932 23.882 31.5 31.44 37.314c-5.31 3.25-12.814 3.502-20.285.003a30.646 30.646 0 0 1-5.193-3.098c3.162 5.058 8.033 9.423 13.96 11.97 7.07 3.039 14.1 2.833 19.336.05l-.004.007c.024-.016.055-.032.08-.047.214-.116.428-.234.636-.358 2.516-1.306 7.485-2.63 10.152 2.559.654 1.27 2.041-5.46-3.061-11.74z"/></svg></span><span class="repo-name">Swift</span></a>
+            <a class="repo-card" href="https://github.com/waus/tmark-kotlin" target="_blank" rel="noreferrer" aria-label="Kotlin renderer"><span class="repo-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><defs><radialGradient id="kotlin-mark" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(48) rotate(180) scale(48)"><stop stop-color="#E44857"/><stop offset=".504494" stop-color="#C711E1"/><stop offset="1" stop-color="#7F52FF"/></radialGradient></defs><path d="M48 48H0V0h48L23.505 23.6475 48 48Z" fill="url(#kotlin-mark)"/></svg></span><span class="repo-name">Kotlin</span></a>
+          </div>
+        </div>
+        <div class="ecosystem-tier">
+          <h3 class="tier-heading">Use tmark in your backend or tools</h3>
+          <div class="library-list">
+            <a class="library-link" href="https://github.com/waus/tmark-go" target="_blank" rel="noreferrer"><span>Go</span><span class="repo-arrow">↗</span></a>
+            <a class="library-link" href="https://github.com/waus/tmark-rust" target="_blank" rel="noreferrer"><span>Rust</span><span class="repo-arrow">↗</span></a>
+            <a class="library-link" href="https://github.com/waus/tmark-python" target="_blank" rel="noreferrer"><span>Python</span><span class="repo-arrow">↗</span></a>
+            <a class="library-link language-cta" href="https://github.com/waus/tmark" target="_blank" rel="noreferrer"><span>Add your language — it’s simple</span><span class="repo-arrow">↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-grid wrap">
+      <p><strong>tmark</strong> · Structured document markup</p>
+      <p>Open source on <a href="https://github.com/waus/tmark" target="_blank" rel="noreferrer">GitHub</a></p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const tabs = [...document.querySelectorAll('[role="tab"]')];
+      const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+      const mobile = window.matchMedia('(max-width: 680px)');
+
+      function selectTab(selected) {
+        tabs.forEach((tab) => {
+          const active = tab === selected;
+          tab.setAttribute('aria-selected', String(active));
+          tab.tabIndex = active ? 0 : -1;
+        });
+        panels.forEach((panel) => {
+          panel.hidden = mobile.matches && panel.id !== selected.getAttribute('aria-controls');
+        });
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => selectTab(tab));
+        tab.addEventListener('keydown', (event) => {
+          if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+          event.preventDefault();
+          const step = event.key === 'ArrowRight' ? 1 : -1;
+          const next = tabs[(index + step + tabs.length) % tabs.length];
+          selectTab(next);
+          next.focus();
+        });
+      });
+
+      function syncPanels() {
+        if (mobile.matches) selectTab(document.querySelector('[role="tab"][aria-selected="true"]'));
+        else panels.forEach((panel) => { panel.hidden = false; });
+      }
+      mobile.addEventListener('change', syncPanels);
+      syncPanels();
+
+      const copy = document.querySelector('[data-copy]');
+      copy.addEventListener('click', async () => {
+        const text = document.querySelector('#tmark-example').textContent;
+        try {
+          await navigator.clipboard.writeText(text);
+          copy.textContent = 'Copied';
+          setTimeout(() => { copy.textContent = 'Copy'; }, 1400);
+        } catch {
+          copy.textContent = 'Select text';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
