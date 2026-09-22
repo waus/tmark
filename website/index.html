@@ -209,9 +209,11 @@
       font: 500 clamp(.73rem, 1.25vw, .86rem)/1.78 var(--mono);
       white-space: pre-wrap;
     }
-    .code-tag { color: var(--inverse-fg); }
-    .code-field { color: var(--inverse-muted); }
-    .code-text { color: var(--inverse-fg); }
+    .code-tag { color: #7aa2f7; font-weight: 650; }
+    .code-field { color: #bb9af7; }
+    .code-value { color: #e0af68; }
+    .code-text { color: #c8d3f5; }
+    .code-punct { color: #7f849c; }
     .render-card {
       display: flex;
       flex-direction: column;
@@ -223,8 +225,6 @@
     .render-label { margin-bottom: 1.25rem; font: 700 .7rem/1 var(--mono); text-transform: uppercase; color: var(--muted); letter-spacing: .1em; }
     .render-card h3 { margin-bottom: .6rem; font-size: 1.4rem; letter-spacing: .01em; }
     .render-card p { margin-bottom: 1.1rem; color: var(--muted); font-size: .92rem; }
-    .render-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
-    .render-tags span { padding: .34rem .55rem; border: 1px solid var(--line); border-radius: .2rem; font: 650 .68rem/1 var(--mono); }
     .format-pill {
       position: absolute;
       top: -.9rem;
@@ -462,18 +462,16 @@
           <div class="format-pill">Same data<br>Any UI</div>
           <div class="code-card">
             <div class="window-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="window-title">article.tmark</span></div>
-            <pre><span class="code-tag">{document;</span>
-<span class="code-field">#title{</span><span class="code-text">Hello, world</span><span class="code-field">}</span>
-<span class="code-tag">{h;</span><span class="code-field">#s{1}</span><span class="code-text">Hello, world</span><span class="code-tag">}</span>
-<span class="code-tag">{p;</span><span class="code-text">This is </span><span class="code-tag">{b;</span><span class="code-text">structured</span><span class="code-tag">}</span>
-<span class="code-text">content — not a layout.</span><span class="code-tag">}</span>
-<span class="code-tag">}</span></pre>
+            <pre><span class="code-punct">{</span><span class="code-tag">document</span><span class="code-punct">;</span>
+<span class="code-punct">{</span><span class="code-tag">h</span><span class="code-punct">;</span><span class="code-field">#s</span><span class="code-punct">{</span><span class="code-value">1</span><span class="code-punct">}</span><span class="code-text">Hello, world</span><span class="code-punct">}</span>
+<span class="code-punct">{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">This is </span><span class="code-punct">{</span><span class="code-tag">b</span><span class="code-punct">;</span><span class="code-text">structured</span><span class="code-punct">}</span>
+<span class="code-text">content — not a layout.</span><span class="code-punct">}</span>
+<span class="code-punct">}</span></pre>
           </div>
           <div class="render-card">
             <div class="render-label">Your app · Your styles</div>
             <h3>Hello, world</h3>
             <p>This is <strong>structured</strong> content — not a layout.</p>
-            <div class="render-tags"><span>Web</span><span>iOS</span><span>Android</span></div>
           </div>
         </div>
       </div>
@@ -521,16 +519,16 @@
           <div class="demo-grid">
             <div class="source-panel demo-panel" id="source-panel" role="tabpanel" aria-labelledby="source-tab">
               <div class="panel-head"><span>article.tmark</span><button class="copy-button" type="button" data-copy>Copy</button></div>
-              <pre id="tmark-example">{document;
-{h;#s{1}Portable documents}
-{p;Define the structure once. Let every app render it well.}
-{q;{p;Content structure should survive the interface.}}
-{list;
-{li;#type{checkbox}#checked{t}{p;Typed nodes}}
-{li;#type{checkbox}#checked{t}{p;Native rendering}}
-{li;#type{checkbox}#checked{t}{p;No layout hacks}}
-}
-}</pre>
+              <pre id="tmark-example"><span class="code-punct">{</span><span class="code-tag">document</span><span class="code-punct">;</span>
+<span class="code-punct">{</span><span class="code-tag">h</span><span class="code-punct">;</span><span class="code-field">#s</span><span class="code-punct">{</span><span class="code-value">1</span><span class="code-punct">}</span><span class="code-text">Portable documents</span><span class="code-punct">}</span>
+<span class="code-punct">{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">Define the structure once. Let every app render it well.</span><span class="code-punct">}</span>
+<span class="code-punct">{</span><span class="code-tag">q</span><span class="code-punct">;</span><span class="code-punct">{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">Content structure should survive the interface.</span><span class="code-punct">}}</span>
+<span class="code-punct">{</span><span class="code-tag">list</span><span class="code-punct">;</span>
+<span class="code-punct">{</span><span class="code-field">#type</span><span class="code-punct">{</span><span class="code-value">checkbox</span><span class="code-punct">}</span><span class="code-field">#checked</span><span class="code-punct">{</span><span class="code-value">t</span><span class="code-punct">}{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">Typed nodes</span><span class="code-punct">}}</span>
+<span class="code-punct">{</span><span class="code-field">#type</span><span class="code-punct">{</span><span class="code-value">checkbox</span><span class="code-punct">}</span><span class="code-field">#checked</span><span class="code-punct">{</span><span class="code-value">t</span><span class="code-punct">}{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">Native rendering</span><span class="code-punct">}}</span>
+<span class="code-punct">{</span><span class="code-field">#type</span><span class="code-punct">{</span><span class="code-value">checkbox</span><span class="code-punct">}</span><span class="code-field">#checked</span><span class="code-punct">{</span><span class="code-value">t</span><span class="code-punct">}{</span><span class="code-tag">p</span><span class="code-punct">;</span><span class="code-text">No layout hacks</span><span class="code-punct">}}</span>
+<span class="code-punct">}</span>
+<span class="code-punct">}</span></pre>
             </div>
             <div class="preview-panel demo-panel" id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
               <div class="panel-head"><span>Rendered by your product</span><span>Preview</span></div>
