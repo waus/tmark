@@ -231,3 +231,34 @@ written as `#name{value}`; the unnamed field has no field name in the document.
 | `Details` | block | `details` | multiple | `summary`: `inline[]`; `open`: `Boolean` | `block[]` | none |
 | `AttachedMedia` | none | `attached` | always | `hash`: `Text` | `block[]` | none |
 | `Document` | none | `document` | always | `url`: `Text`; `title`: `Text`; `description`: `Text`; `author_name`: `Text`; `author_url`: `Text`; `image_url`: `Text`; `attached_media`: `AttachedMedia[]` | `block[]` | none |
+
+## Media formats
+
+At compatibility level 1, renderers MUST support the following media formats
+for `Image` and `Audio` values, including those nested in other types.
+Support means decoding and displaying images, playing Lottie animations, and
+playing audio. 
+
+### Images — MUST supported
+
+| Format | Representation | Example extension |
+|---|---|---|
+| JPEG | JPEG image | `.jpg`, `.jpeg` |
+| WebP | WebP image | `.webp` |
+| AVIF | AVIF image | `.avif` |
+| PNG | PNG image | `.png` |
+| JPEG XL | JPEG XL image | `.jxl` |
+| Lottie | Self-contained Lottie JSON animation | `.json` |
+
+### Audio — MUST supported
+
+| Codec | Required container | Profile | Example extension |
+|---|---|---|---|
+| MP3 | Native MP3 bitstream | — | `.mp3` |
+| FLAC | Native FLAC container | — | `.flac` |
+| Opus | Ogg | — | `.ogg`, `.opus` |
+| AAC | ISO BMFF / MP4 | AAC-LC | `.m4a`, `.mp4` |
+
+A supported codec in another container does not satisfy these requirements.
+In particular, AAC in ADTS, Opus in WebM, FLAC in Ogg, and AAC profiles other
+than AAC-LC are outside the required set.
