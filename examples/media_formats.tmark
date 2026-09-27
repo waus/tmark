@@ -1,7 +1,7 @@
 {document;
 #url{https://tmark.waus.app/examples/media_formats.tmark}
 #title{Media formats}
-{p;Required formats must work in conforming tmark renderers. Unsupported examples are outside the required set; implementations may support them as extensions. Browser previews are not a conformance test.}
+{p;Required formats must work in conforming tmark renderers.}
 {h;#s{2}MUST supported}
 {h;#s{3}JPEG}
 {img;#caption{JPEG}https://tmark.waus.app/static/media-formats/image.jpg}
@@ -24,6 +24,7 @@
 {h;#s{3}AAC-LC / ISO BMFF (MP4)}
 {audio;#caption{AAC-LC / ISO BMFF (MP4)}https://tmark.waus.app/static/media-formats/tone-aac-lc.m4a}
 {h;#s{2}Unsupported}
+{p;These images shouldn't be rendered and audio shouldn't be playable.}
 {h;#s{3}GIF}
 {img;#caption{GIF}https://tmark.waus.app/static/media-formats/image.gif}
 {h;#s{3}BMP}

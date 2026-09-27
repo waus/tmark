@@ -398,7 +398,7 @@ func edgeCases() tmark.RichBlocks {
 
 func mediaFormats() tmark.RichBlocks {
 	return tmark.NewRichBlocks(
-		tmark.P(tmark.T("Required formats must work in conforming tmark renderers. Unsupported examples are outside the required set; implementations may support them as extensions. Browser previews are not a conformance test.")),
+		tmark.P(tmark.T("Required formats must work in conforming tmark renderers.")),
 		tmark.NewHeader(2, tmark.T("MUST supported")),
 		tmark.NewHeader(3, tmark.T("JPEG")),
 		tmark.NewImage(asset("media-formats/image.jpg")).WithCaption(tmark.NewCaption(tmark.T("JPEG"))),
@@ -421,6 +421,7 @@ func mediaFormats() tmark.RichBlocks {
 		tmark.NewHeader(3, tmark.T("AAC-LC / ISO BMFF (MP4)")),
 		tmark.NewAudio(asset("media-formats/tone-aac-lc.m4a")).WithCaption(tmark.NewCaption(tmark.T("AAC-LC / ISO BMFF (MP4)"))),
 		tmark.NewHeader(2, tmark.T("Unsupported")),
+		tmark.P(tmark.T("These images shouldn't be rendered and audio shouldn't be playable.")),
 		tmark.NewHeader(3, tmark.T("GIF")),
 		tmark.NewImage(asset("media-formats/image.gif")).WithCaption(tmark.NewCaption(tmark.T("GIF"))),
 		tmark.NewHeader(3, tmark.T("BMP")),
