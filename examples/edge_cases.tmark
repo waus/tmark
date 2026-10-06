@@ -6,6 +6,13 @@
 {h;#s{4}Semicolon and line break}
 {p;A semicolon (;) stays literal; line breaks
 stay in the text.}
+{h;#s{4}Line break in a table cell}
+{table;
+{{Row 1}{First line}}
+{{Row 2}{First line
+Second line}}
+{{Row 3}{Last line}}
+}
 {h;#s{4}Special characters in a URL}
 {p;{a;#href{https://example.com/search?q=\{tmark\}\#top}URL with braces and hash}}
 {h;#s{4}Raw markup in a code block}

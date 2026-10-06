@@ -222,7 +222,7 @@ written as `#name{value}`; the unnamed field has no field name in the document.
 | `ListItem` | block | `li` | multiple | `type`: `Text`; `order`: `Number (integer)`; `checked`: `Boolean` | `block[]` | `type`: `a`, `A`, `i`, `I`, or `1` for ordered lists; `checkbox` for checklists |
 | `Map` | block | `map` | none | `lat`: `Number`; `lon`: `Number`; `zoom`: `Number (integer)`; `caption`: `Caption` | none | none |
 | `Image` | block | `img` | none | `caption`: `Caption`; `has_spoiler`: `Boolean` | `Text` | none |
-| `Video` | block | `video` | none | `caption`: `Caption`; `has_spoiler`: `Boolean` | `Text` | none |
+| `Video` | block | `video` | none | `caption`: `Caption`; `has_spoiler`: `Boolean`; `preview`: `Text`; `loop`: `Boolean` | `Text` | `preview` is required |
 | `Audio` | block | `audio` | none | `caption`: `Caption` | `Text` | none |
 | `Slideshow` | block | `slideshow` | always | `caption`: `Caption` | `block[]` | Children: `Image` or `Video` only |
 | `Table` | block | `table` | always | `caption`: `inline[]`; `bordered`: `Boolean`; `striped`: `Boolean` | `TableRow[]` | none |
@@ -247,7 +247,6 @@ playing audio.
 | WebP | WebP image | `.webp` |
 | AVIF | AVIF image | `.avif` |
 | PNG | PNG image | `.png` |
-| JPEG XL | JPEG XL image | `.jxl` |
 | Lottie | Self-contained Lottie JSON animation | `.json` |
 
 ### Audio — MUST supported

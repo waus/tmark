@@ -132,7 +132,7 @@ func allWidgets() tmark.RichBlocks {
 		tmark.NewSlideshow(
 			tmark.NewImage(asset("mountains-rockies.webp")),
 			tmark.NewImage(asset("mountains-valley.webp")),
-			tmark.NewVideo(videoURL),
+			tmark.NewVideo(videoURL, asset("video-preview.webp")),
 		).WithCaption(tmark.NewCaption(tmark.T("Image and video slideshow"))),
 		tmark.NewTable(
 			tmark.NewTableRow(tmark.NewCell(tmark.T("")).Header(), tmark.NewCell(tmark.T("Tmark")).Header().WithAlign(tmark.TableCellAlignCenter), tmark.NewCell(tmark.T("Markdown")).Header().WithAlign(tmark.TableCellAlignCenter), tmark.NewCell(tmark.T("HTML")).Header().WithAlign(tmark.TableCellAlignCenter), tmark.NewCell(tmark.T("LaTeX")).Header().WithAlign(tmark.TableCellAlignCenter)),
@@ -188,7 +188,7 @@ func mediaGallery() tmark.RichBlocks {
 		).WithCaption(tmark.NewCaption(tmark.T("Image collage"))),
 		tmark.NewSlideshow(
 			tmark.NewImage(asset("mountains-hero.webp")),
-			tmark.NewVideo(videoURL).WithSpoiler(),
+			tmark.NewVideo(videoURL, asset("video-preview.webp")).WithSpoiler(),
 			tmark.NewImage(asset("mountains-valley.webp")),
 		).WithCaption(tmark.NewCaption(tmark.T("Image and video slideshow"))),
 		tmark.NewAudio(audioURL).WithCaption(tmark.NewCaption(tmark.T("Ambient mountain audio"))),
@@ -366,6 +366,12 @@ func edgeCases() tmark.RichBlocks {
 		tmark.P(tmark.T("Reserved characters: # { } \\ should be escaped.")),
 		tmark.NewHeader(4, tmark.T("Semicolon and line break")),
 		tmark.P(tmark.T("A semicolon (;) stays literal; line breaks\nstay in the text.")),
+		tmark.NewHeader(4, tmark.T("Line break in a table cell")),
+		tmark.NewTable(
+			tmark.NewTableRow(tmark.NewCell(tmark.T("Row 1")), tmark.NewCell(tmark.T("First line"))),
+			tmark.NewTableRow(tmark.NewCell(tmark.T("Row 2")), tmark.NewCell(tmark.T("First line\nSecond line"))),
+			tmark.NewTableRow(tmark.NewCell(tmark.T("Row 3")), tmark.NewCell(tmark.T("Last line"))),
+		),
 		tmark.NewHeader(4, tmark.T("Special characters in a URL")),
 		tmark.P(tmark.NewLink("https://example.com/search?q={tmark}#top", tmark.T("URL with braces and hash"))),
 		tmark.NewHeader(4, tmark.T("Raw markup in a code block")),
@@ -408,8 +414,6 @@ func mediaFormats() tmark.RichBlocks {
 		tmark.NewImage(asset("media-formats/image.avif")).WithCaption(tmark.NewCaption(tmark.T("AVIF"))),
 		tmark.NewHeader(3, tmark.T("PNG")),
 		tmark.NewImage(asset("media-formats/image.png")).WithCaption(tmark.NewCaption(tmark.T("PNG"))),
-		tmark.NewHeader(3, tmark.T("JPEG XL")),
-		tmark.NewImage(asset("media-formats/image.jxl")).WithCaption(tmark.NewCaption(tmark.T("JPEG XL"))),
 		tmark.NewHeader(3, tmark.T("Lottie JSON")),
 		tmark.NewImage(asset("media-formats/animation.json")).WithCaption(tmark.NewCaption(tmark.T("Lottie JSON"))),
 		tmark.NewHeader(3, tmark.T("MP3 / native MP3")),
@@ -422,6 +426,8 @@ func mediaFormats() tmark.RichBlocks {
 		tmark.NewAudio(asset("media-formats/tone-aac-lc.m4a")).WithCaption(tmark.NewCaption(tmark.T("AAC-LC / ISO BMFF (MP4)"))),
 		tmark.NewHeader(2, tmark.T("Unsupported")),
 		tmark.P(tmark.T("These images shouldn't be rendered and audio shouldn't be playable.")),
+		tmark.NewHeader(3, tmark.T("JPEG XL")),
+		tmark.NewImage(asset("media-formats/image.jxl")).WithCaption(tmark.NewCaption(tmark.T("JPEG XL"))),
 		tmark.NewHeader(3, tmark.T("GIF")),
 		tmark.NewImage(asset("media-formats/image.gif")).WithCaption(tmark.NewCaption(tmark.T("GIF"))),
 		tmark.NewHeader(3, tmark.T("BMP")),

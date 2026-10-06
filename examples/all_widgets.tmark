@@ -48,7 +48,7 @@ func main() \{
 #caption{Image and video slideshow}
 {img;https://tmark.waus.app/static/mountains-rockies.webp}
 {img;https://tmark.waus.app/static/mountains-valley.webp}
-{video;https://tmark.waus.app/static/Big_Buck_Bunny_720_10s_1MB.mp4}
+{video;#preview{https://tmark.waus.app/static/video-preview.webp}https://tmark.waus.app/static/Big_Buck_Bunny_720_10s_1MB.mp4}
 }
 {table;
 #caption{Table}

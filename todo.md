@@ -1,3 +1,4 @@
 - Describe in detail how to render types with recommendations.
 - Finish figuring out the data model for video/audio previews and responsive images.
 - Work out a collage generation algorithm for different platforms so it is consistent everywhere and does not look awful.
+- Standard for media content schemes
